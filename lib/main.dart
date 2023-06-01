@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:imc10/models/imc_hive_model.dart';
 import 'package:imc10/pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Hive.initFlutter();
+  Hive.registerAdapter(ImcHiveModelAdapter());
   runApp(const MyApp());
 }
 
