@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:imc10/controllers/home_controller.dart';
+import 'package:imc10/controllers/home_hive_controller.dart';
+import 'package:imc10/models/imc_hive_model.dart';
+import 'package:imc10/pages/list_imc_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -8,6 +11,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+late HomeHiveController homeHiveController;
+List<ImcHiveModel> listImc = [];
 late TextEditingController _weightEC;
 late TextEditingController _heightEC;
 final _formKey = GlobalKey<FormState>();
@@ -16,12 +21,18 @@ final HomeController homeController = HomeController();
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    homeController.addListener(() {
-      setState(() {});
-    });
+    // homeController.addListener(() {
+    //   setState(() {});
+    // });
+    homeHiveController = HomeHiveController();
+    loadImcs();
     _weightEC = TextEditingController();
     _heightEC = TextEditingController();
     super.initState();
+  }
+
+  Future<void> loadImcs() async {
+    listImc = await homeHiveController.getImcList();
   }
 
   @override
@@ -37,6 +48,17 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
         title: const Text('IMC APP'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => ListImcPage(imcList: listImc)));
+              },
+              icon: const Icon(
+                Icons.history_outlined,
+                color: Colors.white,
+              ))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(50),
@@ -84,11 +106,20 @@ class _HomePageState extends State<HomePage> {
                       bool isValidForm =
                           _formKey.currentState?.validate() ?? false;
 
-                      if (true) {
+                      if (isValidForm) {
                         double weightDouble = double.parse(_weightEC.text);
                         double heightDouble = double.parse(_heightEC.text);
                         await homeController.calculateIMC(
                             height: heightDouble, weight: weightDouble);
+
+                        var imcHiveModel = ImcHiveModel()
+                          ..height = heightDouble
+                          ..weight = weightDouble;
+
+                        await homeHiveController.saveImc(
+                            imcHiveModel: imcHiveModel);
+
+                        setState(() {});
                       }
                     },
                     child: const Text('Calcular'),
