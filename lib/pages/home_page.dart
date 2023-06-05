@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                 TextFormField(
                   controller: _weightEC,
                   decoration: const InputDecoration(
-                    label: Text('Peso'),
+                    label: Text('Peso (Em quilogramas)'),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (String? value) {
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                 TextFormField(
                   controller: _heightEC,
                   decoration: const InputDecoration(
-                    label: Text('Altura'),
+                    label: Text('Altura (Em metros)'),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (String? value) {
@@ -109,15 +109,21 @@ class _HomePageState extends State<HomePage> {
                       if (isValidForm) {
                         double weightDouble = double.parse(_weightEC.text);
                         double heightDouble = double.parse(_heightEC.text);
+                        double result = await homeHiveController.calculateIMC(
+                            weight: weightDouble, height: heightDouble);
+
                         await homeController.calculateIMC(
                             height: heightDouble, weight: weightDouble);
 
-                        var imcHiveModel = ImcHiveModel()
+                        ImcHiveModel imcHiveModel = ImcHiveModel()
                           ..height = heightDouble
-                          ..weight = weightDouble;
+                          ..weight = weightDouble
+                          ..imc = result;
 
                         await homeHiveController.saveImc(
                             imcHiveModel: imcHiveModel);
+
+                        await loadImcs();
 
                         setState(() {});
                       }

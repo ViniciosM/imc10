@@ -18,17 +18,20 @@ class ImcHiveModelAdapter extends TypeAdapter<ImcHiveModel> {
     };
     return ImcHiveModel()
       ..height = fields[0] as double
-      ..weight = fields[1] as double;
+      ..weight = fields[1] as double
+      ..imc = fields[2] as double;
   }
 
   @override
   void write(BinaryWriter writer, ImcHiveModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.height)
       ..writeByte(1)
-      ..write(obj.weight);
+      ..write(obj.weight)
+      ..writeByte(2)
+      ..write(obj.imc);
   }
 
   @override
